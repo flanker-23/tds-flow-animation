@@ -2771,7 +2771,7 @@
                             <div class="api-call" id="api-fetch-banks">
                                 <div class="api-header">
                                     <span class="api-method" style="background: #10b981;">GET</span>
-                                    <span class="api-endpoint">/internal/v1/merchant/JInBTCIHDIQAOW/bank_accounts</span>
+                                    <span class="api-endpoint">x-balances-ext.razorpay.com/v1/accounts?merchant_id=JInBTCIHDIQAOW</span>
                                 </div>
                                 <div class="api-payload" id="api-fetch-banks-payload">
 <pre class="api-json">Response: { bank_accounts: [...] }</pre>
@@ -3751,7 +3751,7 @@
                     <!-- API Call Animation for Bank Fetch (in modal) -->
                     <div class="api-call" id="api-modal-fetch-banks" style="margin-top: 12px; font-size: 0.8rem;">
                         <span class="api-method" style="background: #10b981; padding: 3px 8px; font-size: 0.7rem;">GET</span>
-                        <span class="api-endpoint" style="font-size: 0.75rem;">/internal/v1/merchant/{id}/bank_accounts</span>
+                        <span class="api-endpoint" style="font-size: 0.75rem;">x-balances-ext.razorpay.com/v1/accounts</span>
                         <div class="api-payload" id="bank-api-response" style="font-size: 0.7rem; margin-top: 6px;"></div>
                     </div>
                 </div>
@@ -3981,7 +3981,7 @@
                     <!-- API Call Animation for Bank Fetch in Edit Modal -->
                     <div class="api-call" id="api-edit-fetch-banks" style="margin-top: 12px; font-size: 0.8rem;">
                         <span class="api-method" style="background: #10b981; padding: 3px 8px; font-size: 0.7rem;">GET</span>
-                        <span class="api-endpoint" style="font-size: 0.75rem;">/internal/v1/merchant/{id}/bank_accounts</span>
+                        <span class="api-endpoint" style="font-size: 0.75rem;">x-balances-ext.razorpay.com/v1/accounts</span>
                         <div class="api-payload" id="edit-bank-api-response" style="font-size: 0.7rem; margin-top: 6px;"></div>
                     </div>
                 </div>
@@ -4391,8 +4391,8 @@
                             <td>4</td>
                             <td><strong>Bank Accounts</strong></td>
                             <td><code>GET</code></td>
-                            <td><code>/internal/v1/merchant/{merchant_id}/bank_accounts</code></td>
-                            <td>Fetch merchant bank accounts</td>
+                            <td><code>x-balances-ext.razorpay.com/v1/accounts?merchant_id={merchant_id}</code></td>
+                            <td>Fetch merchant bank accounts (List Accounts API)</td>
                         </tr>
                         <tr>
                             <td>5</td>
@@ -4537,30 +4537,102 @@
 
                 <!-- Bank Accounts API -->
                 <div class="doc-section" id="api-bank-accounts">
-                    <div class="doc-section-title">5. Bank Accounts API</div>
+                    <div class="doc-section-title">5. Bank Accounts API (List Accounts)</div>
                     <div class="doc-api-block">
                         <div class="doc-api-method">GET</div>
-                        <div class="doc-api-endpoint">/internal/v1/merchant/{merchant_id}/bank_accounts</div>
+                        <div class="doc-api-endpoint">https://x-balances-ext.razorpay.com/v1/accounts?merchant_id={merchant_id}</div>
                     </div>
+
+                    <div class="doc-subsection-title">Query Parameters</div>
+                    <table class="doc-table">
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td><code>merchant_id</code></td>
+                            <td>string</td>
+                            <td>Razorpay merchant identifier (e.g., <code>JInBTCIHDIQAOW</code>)</td>
+                        </tr>
+                    </table>
+
+                    <div class="doc-subsection-title">Headers</div>
+                    <table class="doc-table">
+                        <tr>
+                            <th>Header</th>
+                            <th>Value</th>
+                        </tr>
+                        <tr>
+                            <td><code>Authorization</code></td>
+                            <td>Bearer token / API key</td>
+                        </tr>
+                    </table>
 
                     <div class="doc-subsection-title">Response</div>
                     <div class="doc-code-block">
 <pre>{
-  <span class="string">"success"</span>: <span class="keyword">true</span>,
-  <span class="string">"data"</span>: {
-    <span class="string">"bank_accounts"</span>: [
-      {
-        <span class="string">"id"</span>: <span class="string">"ba_LhVdGS8Nrt"</span>,
-        <span class="string">"account_number"</span>: <span class="string">"XXXXXXXX5678"</span>,
-        <span class="string">"ifsc"</span>: <span class="string">"HDFC0001234"</span>,
-        <span class="string">"bank_name"</span>: <span class="string">"HDFC Bank"</span>,
-        <span class="string">"beneficiary_name"</span>: <span class="string">"Acme Pvt Ltd"</span>,
-        <span class="string">"account_type"</span>: <span class="string">"current"</span>
-      }
-    ]
-  }
+  <span class="string">"accounts"</span>: [
+    {
+      <span class="string">"status"</span>: <span class="string">"active"</span>,
+      <span class="string">"merchantId"</span>: <span class="string">"JInBTCIHDIQAOW"</span>,
+      <span class="string">"accountNumber"</span>: <span class="string">"400700000000"</span>,
+      <span class="string">"accountType"</span>: <span class="string">"direct"</span>,
+      <span class="string">"channel"</span>: <span class="string">"rbl"</span>,
+      <span class="string">"currency"</span>: <span class="string">"INR"</span>,
+      <span class="string">"balance"</span>: <span class="string">"603546"</span>,
+      <span class="string">"lastChangedAt"</span>: <span class="string">"1757569495"</span>,
+      <span class="string">"lastFetchedAt"</span>: <span class="string">"1757930450"</span>,
+      <span class="string">"lastAttemptedAt"</span>: <span class="string">"1757930450"</span>,
+      <span class="string">"createdAt"</span>: <span class="string">"1757569450"</span>
+    }
+  ]
 }</pre>
                     </div>
+
+                    <div class="doc-subsection-title">Response Fields</div>
+                    <table class="doc-table">
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td><code>status</code></td>
+                            <td>string</td>
+                            <td>Account status (<code>active</code>, <code>inactive</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><code>merchantId</code></td>
+                            <td>string</td>
+                            <td>Razorpay merchant ID</td>
+                        </tr>
+                        <tr>
+                            <td><code>accountNumber</code></td>
+                            <td>string</td>
+                            <td>Bank account number</td>
+                        </tr>
+                        <tr>
+                            <td><code>accountType</code></td>
+                            <td>string</td>
+                            <td>Account type (<code>direct</code>, <code>current</code>, etc.)</td>
+                        </tr>
+                        <tr>
+                            <td><code>channel</code></td>
+                            <td>string</td>
+                            <td>Banking channel (<code>rbl</code>, <code>icici</code>, <code>axis</code>, etc.)</td>
+                        </tr>
+                        <tr>
+                            <td><code>currency</code></td>
+                            <td>string</td>
+                            <td>Account currency (e.g., <code>INR</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><code>balance</code></td>
+                            <td>string</td>
+                            <td>Current balance in paise</td>
+                        </tr>
+                    </table>
                 </div>
 
                 <!-- Contacts API -->
