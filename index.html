@@ -2782,7 +2782,7 @@
                             <div class="api-call" id="api-ldc-get-contacts" style="border-left-color: #8b5cf6;">
                                 <div class="api-header">
                                     <span class="api-method" style="background: #10b981;">GET</span>
-                                    <span class="api-endpoint">/internal/v1/merchant/JInBTCIHDIQAOW/contacts</span>
+                                    <span class="api-endpoint">/merchant/api/live/contacts?active=1&count=15</span>
                                 </div>
                                 <div class="api-payload" id="api-ldc-contacts-payload">
 <pre class="api-json">Response: { contacts: [...] }</pre>
@@ -4230,7 +4230,7 @@
                     <!-- API Call Animation for Contact Fetch -->
                     <div class="api-call" id="api-fetch-contacts" style="margin-bottom: 12px; font-size: 0.8rem;">
                         <span class="api-method" style="background: #10b981; padding: 3px 8px; font-size: 0.7rem;">GET</span>
-                        <span class="api-endpoint" style="font-size: 0.75rem;">/internal/v1/merchant/{id}/contacts</span>
+                        <span class="api-endpoint" style="font-size: 0.75rem;">/merchant/api/live/contacts?active=1</span>
                         <div class="api-payload" id="contacts-api-response" style="font-size: 0.7rem; margin-top: 6px;"></div>
                     </div>
                     
@@ -4398,7 +4398,7 @@
                             <td>5</td>
                             <td><strong>Contacts</strong></td>
                             <td><code>GET</code></td>
-                            <td><code>/internal/v1/merchant/{merchant_id}/contacts</code></td>
+                            <td><code>/merchant/api/live/contacts?active=1&count=15</code></td>
                             <td>Fetch merchant contacts/vendors</td>
                         </tr>
                         <tr>
@@ -4568,26 +4568,86 @@
                     <div class="doc-section-title">6. Contacts API</div>
                     <div class="doc-api-block">
                         <div class="doc-api-method">GET</div>
-                        <div class="doc-api-endpoint">/internal/v1/merchant/{merchant_id}/contacts</div>
+                        <div class="doc-api-endpoint">/merchant/api/live/contacts?active=1&count=15</div>
                     </div>
+
+                    <div class="doc-subsection-title">Query Parameters</div>
+                    <table class="doc-table">
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td><code>active</code></td>
+                            <td>integer</td>
+                            <td>Filter by active status (1 = active only)</td>
+                        </tr>
+                        <tr>
+                            <td><code>count</code></td>
+                            <td>integer</td>
+                            <td>Number of contacts to return (default: 15)</td>
+                        </tr>
+                    </table>
 
                     <div class="doc-subsection-title">Response</div>
                     <div class="doc-code-block">
 <pre>{
+  <span class="string">"status_code"</span>: <span class="number">200</span>,
   <span class="string">"success"</span>: <span class="keyword">true</span>,
   <span class="string">"data"</span>: {
-    <span class="string">"contacts"</span>: [
+    <span class="string">"entity"</span>: <span class="string">"collection"</span>,
+    <span class="string">"count"</span>: <span class="number">15</span>,
+    <span class="string">"items"</span>: [
       {
-        <span class="string">"id"</span>: <span class="string">"cont_OxGtNkW8Y1"</span>,
-        <span class="string">"name"</span>: <span class="string">"ABC Contractors"</span>,
+        <span class="string">"id"</span>: <span class="string">"cont_S2eaCqQJScx1Ei"</span>,
+        <span class="string">"entity"</span>: <span class="string">"contact"</span>,
+        <span class="string">"name"</span>: <span class="string">"LINUX"</span>,
+        <span class="string">"contact"</span>: <span class="string">"9878987896"</span>,
+        <span class="string">"email"</span>: <span class="string">"linuxtorwalds@linux.com"</span>,
         <span class="string">"type"</span>: <span class="string">"vendor"</span>,
-        <span class="string">"pan"</span>: <span class="string">"ABCPV1234F"</span>,
-        <span class="string">"gstin"</span>: <span class="string">"27ABCPV1234F1ZP"</span>
+        <span class="string">"reference_id"</span>: <span class="string">""</span>,
+        <span class="string">"active"</span>: <span class="keyword">true</span>,
+        <span class="string">"created_at"</span>: <span class="number">1768152424</span>,
+        <span class="string">"tds_category"</span>: <span class="number">51</span>,
+        <span class="string">"vendor"</span>: {
+          <span class="string">"contact_id"</span>: <span class="string">"cont_S2eaCqQJScx1Ei"</span>,
+          <span class="string">"gstin"</span>: <span class="string">"01AADCB1234M1ZX"</span>,
+          <span class="string">"id"</span>: <span class="string">"S2ePjc9019WJ1X"</span>,
+          <span class="string">"merchant_id"</span>: <span class="string">"JInBTCIHDIQAOW"</span>,
+          <span class="string">"pan"</span>: <span class="string">"ABCCD1234A"</span>,
+          <span class="string">"tds_category"</span>: <span class="number">51</span>
+        },
+        <span class="string">"gstin"</span>: <span class="string">"01AADCB1234M1ZX"</span>
       }
     ]
   }
 }</pre>
                     </div>
+
+                    <div class="doc-subsection-title">Contact Types</div>
+                    <table class="doc-table">
+                        <tr>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td><code>vendor</code></td>
+                            <td>Vendor/Supplier contact (has vendor details with PAN, GSTIN)</td>
+                        </tr>
+                        <tr>
+                            <td><code>employee</code></td>
+                            <td>Employee contact</td>
+                        </tr>
+                        <tr>
+                            <td><code>customer</code></td>
+                            <td>Customer contact</td>
+                        </tr>
+                        <tr>
+                            <td><code>rzp_tax_pay</code></td>
+                            <td>Razorpay Tax Payment system contact</td>
+                        </tr>
+                    </table>
                 </div>
 
                 <!-- LDC Certificate API -->
