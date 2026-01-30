@@ -4960,6 +4960,10 @@
                     </div>
 
                     <div class="doc-subsection-title" style="margin-top: 24px;">Mode 2: Search by Certificate Number</div>
+                    <div class="doc-callout doc-callout-success" style="margin-bottom: 12px;">
+                        <div class="doc-callout-title">Returns All Certificates</div>
+                        <p>This mode returns the certificate details <strong>regardless of whether it is currently active, expired, or pending</strong>. The <code>is_active</code> field in the response indicates the current validity status.</p>
+                    </div>
                     <div class="doc-api-block">
                         <div class="doc-api-method">GET</div>
                         <div class="doc-api-endpoint">/internal/v1/tds/merchant/{merchant_id}/ldc</div>
@@ -5769,6 +5773,43 @@
         
         document.getElementById('db-docs-modal').addEventListener('click', function(e) {
             if (e.target === this) hideDbDocs();
+        });
+        
+        // Handle TOC link clicks within modals - scroll within modal content, not page
+        document.querySelectorAll('#api-docs-modal .doc-toc-list a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                const modalContent = document.querySelector('#api-docs-modal .doc-modal-content');
+                
+                if (targetElement && modalContent) {
+                    // Calculate scroll position relative to modal content
+                    const targetPosition = targetElement.offsetTop - modalContent.offsetTop;
+                    modalContent.scrollTo({
+                        top: targetPosition - 20,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        document.querySelectorAll('#db-docs-modal .doc-toc-list a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                const modalContent = document.querySelector('#db-docs-modal .doc-modal-content');
+                
+                if (targetElement && modalContent) {
+                    // Calculate scroll position relative to modal content
+                    const targetPosition = targetElement.offsetTop - modalContent.offsetTop;
+                    modalContent.scrollTo({
+                        top: targetPosition - 20,
+                        behavior: 'smooth'
+                    });
+                }
+            });
         });
 
         // ==================== INTERACTIVE MODE ====================
