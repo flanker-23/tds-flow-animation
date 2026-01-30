@@ -3908,24 +3908,47 @@
                     <label class="form-label">PAN<span class="required">*</span></label>
                     <input type="text" class="form-input" id="rp-pan-input" placeholder="e.g., DKLPT3483J" maxlength="10">
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Street Address<span class="required">*</span></label>
-                    <input type="text" class="form-input" id="rp-street-input" placeholder="Street address">
-                </div>
-                <div class="form-row-3">
-                    <div class="form-group">
-                        <label class="form-label">City<span class="required">*</span></label>
-                        <input type="text" class="form-input" id="rp-city-input" placeholder="City">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">State<span class="required">*</span></label>
-                        <input type="text" class="form-input" id="rp-state-input" placeholder="State">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">PIN<span class="required">*</span></label>
-                        <input type="text" class="form-input" id="rp-pin-input" placeholder="PIN" maxlength="6">
+                
+                <!-- Address Section with Organization Option -->
+                <div class="form-section-title" style="margin-top: 16px; font-size: 0.9rem;">
+                    Address Details
+                    <div class="use-org-address-toggle" style="float: right; font-weight: normal; font-size: 0.8rem;">
+                        <label class="checkbox-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="use-org-address-checkbox" onchange="toggleUseOrgAddress(this.checked)">
+                            <span style="color: var(--accent-blue);">📍 Use Organization Address</span>
+                        </label>
                     </div>
                 </div>
+                
+                <div id="rp-address-fields">
+                    <div class="form-group">
+                        <label class="form-label">Street Address<span class="required">*</span></label>
+                        <input type="text" class="form-input" id="rp-street-input" placeholder="Street address">
+                    </div>
+                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label class="form-label">City<span class="required">*</span></label>
+                            <input type="text" class="form-input" id="rp-city-input" placeholder="City">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">State<span class="required">*</span></label>
+                            <input type="text" class="form-input" id="rp-state-input" placeholder="State">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">PIN<span class="required">*</span></label>
+                            <input type="text" class="form-input" id="rp-pin-input" placeholder="PIN" maxlength="6">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Organization Address Preview (shown when checkbox is selected) -->
+                <div id="org-address-preview" style="display: none; background: rgba(59, 130, 246, 0.1); border: 1px solid var(--accent-blue); border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+                    <div style="font-size: 0.75rem; color: var(--accent-blue); margin-bottom: 6px; font-weight: 600;">
+                        📍 Using Organization Address
+                    </div>
+                    <div id="org-address-text" style="font-size: 0.85rem; color: var(--text-primary); line-height: 1.5;"></div>
+                </div>
+                
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Email<span class="required">*</span></label>
@@ -4100,24 +4123,45 @@
                         <label class="form-label">PAN<span class="required">*</span></label>
                         <input type="text" class="form-input" id="edit-rp-pan" maxlength="10">
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Street Address<span class="required">*</span></label>
-                        <input type="text" class="form-input" id="edit-rp-street">
+                    
+                    <!-- Address Section with Organization Option -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin: 12px 0 8px 0;">
+                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">Address Details</span>
+                        <label class="checkbox-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.8rem;">
+                            <input type="checkbox" id="edit-use-org-address-checkbox" onchange="toggleEditUseOrgAddress(this.checked)">
+                            <span style="color: var(--accent-blue);">📍 Use Organization Address</span>
+                        </label>
                     </div>
-                    <div class="form-row-3">
+                    
+                    <div id="edit-rp-address-fields">
                         <div class="form-group">
-                            <label class="form-label">City<span class="required">*</span></label>
-                            <input type="text" class="form-input" id="edit-rp-city">
+                            <label class="form-label">Street Address<span class="required">*</span></label>
+                            <input type="text" class="form-input" id="edit-rp-street">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">State<span class="required">*</span></label>
-                            <input type="text" class="form-input" id="edit-rp-state">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">PIN<span class="required">*</span></label>
-                            <input type="text" class="form-input" id="edit-rp-pin" maxlength="6">
+                        <div class="form-row-3">
+                            <div class="form-group">
+                                <label class="form-label">City<span class="required">*</span></label>
+                                <input type="text" class="form-input" id="edit-rp-city">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">State<span class="required">*</span></label>
+                                <input type="text" class="form-input" id="edit-rp-state">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">PIN<span class="required">*</span></label>
+                                <input type="text" class="form-input" id="edit-rp-pin" maxlength="6">
+                            </div>
                         </div>
                     </div>
+                    
+                    <!-- Organization Address Preview (shown when checkbox is selected) -->
+                    <div id="edit-org-address-preview" style="display: none; background: rgba(59, 130, 246, 0.1); border: 1px solid var(--accent-blue); border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+                        <div style="font-size: 0.75rem; color: var(--accent-blue); margin-bottom: 6px; font-weight: 600;">
+                            📍 Using Organization Address
+                        </div>
+                        <div id="edit-org-address-text" style="font-size: 0.85rem; color: var(--text-primary); line-height: 1.5;"></div>
+                    </div>
+                    
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Email<span class="required">*</span></label>
@@ -5757,7 +5801,103 @@
             document.getElementById('filing-modal').classList.remove('visible');
             document.getElementById('filing-row').classList.remove('highlight');
             showFilingStep(1);
+            // Reset the use org address checkbox
+            document.getElementById('use-org-address-checkbox').checked = false;
+            toggleUseOrgAddress(false);
             updateStepText('TDS Filing setup cancelled. Click toggle to try again.');
+        }
+
+        // State to track if using org address
+        let useOrgAddressForRP = false;
+        let editUseOrgAddressForRP = false;
+
+        function toggleUseOrgAddress(checked) {
+            useOrgAddressForRP = checked;
+            const addressFields = document.getElementById('rp-address-fields');
+            const orgPreview = document.getElementById('org-address-preview');
+            const orgAddressText = document.getElementById('org-address-text');
+            
+            if (checked) {
+                // Get organization address from merchant details (from Step 2 inputs or dbState)
+                const street = document.getElementById('street-input')?.value || 
+                               dbState.metadata['TDS_MERCHANT_DETAILS']?.value?.street || '';
+                const city = document.getElementById('city-input')?.value || 
+                             dbState.metadata['TDS_MERCHANT_DETAILS']?.value?.city || '';
+                const state = document.getElementById('state-input')?.value || 
+                              dbState.metadata['TDS_MERCHANT_DETAILS']?.value?.state || '';
+                const pin = document.getElementById('pin-input')?.value || 
+                            dbState.metadata['TDS_MERCHANT_DETAILS']?.value?.postal_code || '';
+                
+                if (!street && !city && !state && !pin) {
+                    alert('Organization address not available. Please fill in Step 2 first or enter address manually.');
+                    document.getElementById('use-org-address-checkbox').checked = false;
+                    useOrgAddressForRP = false;
+                    return;
+                }
+                
+                // Fill the hidden fields with org values
+                document.getElementById('rp-street-input').value = street;
+                document.getElementById('rp-city-input').value = city;
+                document.getElementById('rp-state-input').value = state;
+                document.getElementById('rp-pin-input').value = pin;
+                
+                // Show preview, hide input fields
+                addressFields.style.display = 'none';
+                orgPreview.style.display = 'block';
+                orgAddressText.innerHTML = `<strong>${street}</strong><br>${city}, ${state} - ${pin}`;
+                
+                updateStepText('📍 Using organization address for responsible person');
+            } else {
+                // Show input fields, hide preview
+                addressFields.style.display = 'block';
+                orgPreview.style.display = 'none';
+                
+                // Clear the fields if they want to enter manually
+                document.getElementById('rp-street-input').value = '';
+                document.getElementById('rp-city-input').value = '';
+                document.getElementById('rp-state-input').value = '';
+                document.getElementById('rp-pin-input').value = '';
+            }
+        }
+
+        function toggleEditUseOrgAddress(checked) {
+            editUseOrgAddressForRP = checked;
+            const addressFields = document.getElementById('edit-rp-address-fields');
+            const orgPreview = document.getElementById('edit-org-address-preview');
+            const orgAddressText = document.getElementById('edit-org-address-text');
+            
+            if (checked) {
+                // Get organization address from dbState
+                const merchantDetails = dbState.metadata['TDS_MERCHANT_DETAILS']?.value || {};
+                const street = merchantDetails.street || '';
+                const city = merchantDetails.city || '';
+                const state = merchantDetails.state || '';
+                const pin = merchantDetails.postal_code || '';
+                
+                if (!street && !city && !state && !pin) {
+                    alert('Organization address not available in database.');
+                    document.getElementById('edit-use-org-address-checkbox').checked = false;
+                    editUseOrgAddressForRP = false;
+                    return;
+                }
+                
+                // Fill the hidden fields with org values
+                document.getElementById('edit-rp-street').value = street;
+                document.getElementById('edit-rp-city').value = city;
+                document.getElementById('edit-rp-state').value = state;
+                document.getElementById('edit-rp-pin').value = pin;
+                
+                // Show preview, hide input fields
+                addressFields.style.display = 'none';
+                orgPreview.style.display = 'block';
+                orgAddressText.innerHTML = `<strong>${street}</strong><br>${city}, ${state} - ${pin}`;
+                
+                updateStepText('📍 Using organization address for responsible person');
+            } else {
+                // Show input fields, hide preview
+                addressFields.style.display = 'block';
+                orgPreview.style.display = 'none';
+            }
         }
 
         function handleFilingNext() {
@@ -6219,6 +6359,21 @@
             document.getElementById('edit-rp-email').value = responsiblePerson.email || '';
             document.getElementById('edit-rp-mobile').value = responsiblePerson.mobile || '';
             
+            // Check if RP address matches org address and pre-check if so
+            const rpMatchesOrg = 
+                responsiblePerson.street === merchantDetails.street &&
+                responsiblePerson.city === merchantDetails.city &&
+                responsiblePerson.state === merchantDetails.state &&
+                responsiblePerson.postal_code === merchantDetails.postal_code;
+            
+            if (rpMatchesOrg && merchantDetails.street) {
+                document.getElementById('edit-use-org-address-checkbox').checked = true;
+                toggleEditUseOrgAddress(true);
+            } else {
+                document.getElementById('edit-use-org-address-checkbox').checked = false;
+                toggleEditUseOrgAddress(false);
+            }
+            
             showEditTab('config');
             document.getElementById('edit-filing-modal').classList.add('visible');
             updateStepText('✏️ Edit mode: Modify TDS Filing details');
@@ -6226,6 +6381,9 @@
 
         function closeEditFilingModal() {
             document.getElementById('edit-filing-modal').classList.remove('visible');
+            // Reset the use org address checkbox
+            document.getElementById('edit-use-org-address-checkbox').checked = false;
+            toggleEditUseOrgAddress(false);
             updateStepText('Edit cancelled. Settings unchanged.');
         }
 
