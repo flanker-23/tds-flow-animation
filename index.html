@@ -4348,7 +4348,7 @@
                         <a href="#api-overview">1. API Overview</a>
                         <a href="#api-setup">2. TDS Setup API (POST)</a>
                         <a href="#api-status">3. TDS Status API (GET)</a>
-                        <a href="#api-update">4. TDS Update API (POST)</a>
+                        <a href="#api-update">4. TDS Update API (PATCH)</a>
                         <a href="#api-bank-accounts">5. Bank Accounts API (GET)</a>
                         <a href="#api-contacts">6. Contacts API (GET)</a>
                         <a href="#api-ldc">7. LDC Certificate API (POST)</a>
@@ -4383,7 +4383,7 @@
                         <tr>
                             <td>3</td>
                             <td><strong>TDS Update</strong></td>
-                            <td><code>POST</code></td>
+                            <td><code>PATCH</code></td>
                             <td><code>/internal/v1/tds/merchant/{merchant_id}/setup</code></td>
                             <td>Update TDS settings / disable (same endpoint as setup)</td>
                         </tr>
@@ -4500,13 +4500,13 @@
 
                 <!-- TDS Update API -->
                 <div class="doc-section" id="api-update">
-                    <div class="doc-section-title">4. TDS Update API (POST)</div>
+                    <div class="doc-section-title">4. TDS Update API (PATCH)</div>
                     <div class="doc-callout">
                         <div class="doc-callout-title">Same Endpoint as Setup</div>
-                        <p>Updates use the same endpoint as setup. The API detects whether it's a new setup or an update based on existing data.</p>
+                        <p>Updates use the same endpoint as setup with PATCH method. Use for partial updates, disabling settings, or modifying existing configurations.</p>
                     </div>
                     <div class="doc-api-block">
-                        <div class="doc-api-method post">POST</div>
+                        <div class="doc-api-method patch">PATCH</div>
                         <div class="doc-api-endpoint">/internal/v1/tds/merchant/{merchant_id}/setup</div>
                     </div>
 
