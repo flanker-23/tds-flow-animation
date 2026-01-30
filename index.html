@@ -2668,7 +2668,8 @@
                                         <span class="detail-item">Contacts: <strong id="ldc-contact-count">0</strong></span>
                                     </div>
                                 </div>
-                                <div class="toggle-actions">
+                                <div class="toggle-actions" style="gap: 8px; display: flex;">
+                                    <button class="ldc-manage-btn" onclick="openLdcSearchModal()" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">🔍 Search LDC</button>
                                     <button class="ldc-manage-btn" onclick="openLdcModal()">📋 Manage LDC</button>
                                 </div>
                             </div>
@@ -2786,6 +2787,17 @@
                                 </div>
                                 <div class="api-payload" id="api-ldc-contacts-payload">
 <pre class="api-json">Response: { contacts: [...] }</pre>
+                                </div>
+                            </div>
+                            
+                            <!-- LDC Fetch API -->
+                            <div class="api-call" id="api-ldc-fetch" style="border-left-color: #f59e0b;">
+                                <div class="api-header">
+                                    <span class="api-method" style="background: #10b981;">GET</span>
+                                    <span class="api-endpoint" id="api-ldc-fetch-endpoint">/internal/v1/tds/merchant/JInBTCIHDIQAOW/ldc?...</span>
+                                </div>
+                                <div class="api-payload" id="api-ldc-fetch-payload">
+<pre class="api-json">Response: { certificate: {...} }</pre>
                                 </div>
                             </div>
                             
@@ -4374,6 +4386,103 @@
         </div>
     </div>
 
+    <!-- LDC Search Modal -->
+    <div class="modal-overlay" id="ldc-search-modal">
+        <div class="modal" style="max-width: 600px;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                <div class="modal-title">🔍 Search LDC Certificate</div>
+                <button class="modal-close" onclick="closeLdcSearchModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">
+                    Search for active LDC certificates by Contact + Category or by Certificate Number.
+                </p>
+                
+                <!-- Search Mode Tabs -->
+                <div class="edit-tabs" style="margin-bottom: 16px;">
+                    <button class="edit-tab active" onclick="switchLdcSearchMode('contact')" id="ldc-search-tab-contact">By Contact & Category</button>
+                    <button class="edit-tab" onclick="switchLdcSearchMode('certificate')" id="ldc-search-tab-certificate">By Certificate Number</button>
+                </div>
+                
+                <!-- Mode 1: Search by Contact & Category -->
+                <div id="ldc-search-mode-contact">
+                    <div class="form-group">
+                        <label class="form-label">Merchant ID</label>
+                        <input type="text" class="form-input" id="ldc-search-merchant-id" value="JInBTCIHDIQAOW" readonly style="background: var(--bg-tertiary);">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contact ID<span class="required">*</span></label>
+                        <select class="form-input" id="ldc-search-contact-select" onclick="loadLdcSearchContacts()">
+                            <option value="">-- Click to load contacts --</option>
+                        </select>
+                        <div class="bank-fetch-status" id="ldc-search-contacts-status" style="display: none; margin-top: 8px;">
+                            <div class="spinner"></div>
+                            <span>Loading contacts...</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">TDS Category<span class="required">*</span></label>
+                        <select class="form-input" id="ldc-search-category">
+                            <option value="">-- Select TDS Category --</option>
+                            <option value="194C">194C - Contractors</option>
+                            <option value="194J">194J - Professional Services</option>
+                            <option value="194H">194H - Commission/Brokerage</option>
+                            <option value="194I">194I - Rent</option>
+                            <option value="194A">194A - Interest (Non-Bank)</option>
+                            <option value="194D">194D - Insurance Commission</option>
+                            <option value="194M">194M - Contractual Payment</option>
+                            <option value="194N">194N - Cash Withdrawal</option>
+                            <option value="194Q">194Q - Purchase of Goods</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);" onclick="searchLdcByContact()">
+                        🔍 Search Active Certificate
+                    </button>
+                </div>
+                
+                <!-- Mode 2: Search by Certificate Number -->
+                <div id="ldc-search-mode-certificate" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">Merchant ID</label>
+                        <input type="text" class="form-input" id="ldc-search-merchant-id-2" value="JInBTCIHDIQAOW" readonly style="background: var(--bg-tertiary);">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Certificate Number<span class="required">*</span></label>
+                        <input type="text" class="form-input" id="ldc-search-cert-number" placeholder="e.g., LDC-2026-001234">
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);" onclick="searchLdcByCertificate()">
+                        🔍 Search Certificate
+                    </button>
+                </div>
+                
+                <!-- API Call Display -->
+                <div class="api-call" id="api-ldc-search-call" style="margin-top: 16px; display: none;">
+                    <div class="api-header">
+                        <span class="api-method" style="background: #10b981;">GET</span>
+                        <span class="api-endpoint" id="api-ldc-search-endpoint">/internal/v1/tds/merchant/.../ldc?...</span>
+                    </div>
+                    <div class="api-payload" id="api-ldc-search-response"></div>
+                </div>
+                
+                <!-- Search Results -->
+                <div id="ldc-search-results" style="margin-top: 16px; display: none;">
+                    <div class="form-section-title">Search Result</div>
+                    <div id="ldc-search-result-content"></div>
+                </div>
+                
+                <!-- No Results -->
+                <div id="ldc-search-no-results" style="margin-top: 16px; display: none; text-align: center; padding: 30px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3);">
+                    <div style="font-size: 2rem; margin-bottom: 8px;">❌</div>
+                    <div style="color: #ef4444; font-weight: 600;">No Active Certificate Found</div>
+                    <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;" id="ldc-search-no-results-msg">No LDC certificate matches the search criteria.</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeLdcSearchModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <!-- API Documentation Modal -->
     <div class="doc-modal-overlay" id="api-docs-modal">
         <div class="doc-modal">
@@ -4396,6 +4505,7 @@
                         <a href="#api-bank-accounts">5. Bank Accounts API (GET)</a>
                         <a href="#api-contacts">6. Contacts API (GET)</a>
                         <a href="#api-ldc">7. LDC Certificate API (POST)</a>
+                        <a href="#api-ldc-fetch">8. LDC Certificate Fetch API (GET)</a>
                     </div>
                 </div>
 
@@ -4768,7 +4878,7 @@
 
                 <!-- LDC Certificate API -->
                 <div class="doc-section" id="api-ldc">
-                    <div class="doc-section-title">7. LDC Certificate API</div>
+                    <div class="doc-section-title">7. LDC Certificate API (POST)</div>
                     <div class="doc-api-block">
                         <div class="doc-api-method post">POST</div>
                         <div class="doc-api-endpoint">/internal/v1/tds/merchant/{merchant_id}/contact/{contact_id}/ldc</div>
@@ -4799,6 +4909,140 @@
     <span class="string">"created_at"</span>: <span class="number">1737654321</span>
   }
 }</pre>
+                    </div>
+                </div>
+
+                <!-- LDC Certificate Fetch API -->
+                <div class="doc-section" id="api-ldc-fetch">
+                    <div class="doc-section-title">8. LDC Certificate Fetch API (GET)</div>
+                    <div class="doc-callout doc-callout-info">
+                        <div class="doc-callout-title">Dual Search Modes</div>
+                        <p>This API supports two search modes: (1) Search by merchant_id + contact_id + tds_category to find active certificates for today, or (2) Search by merchant_id + certificate_number to fetch a specific certificate.</p>
+                    </div>
+
+                    <div class="doc-subsection-title" style="margin-top: 20px;">Mode 1: Search by Contact & Category</div>
+                    <div class="doc-api-block">
+                        <div class="doc-api-method">GET</div>
+                        <div class="doc-api-endpoint">/internal/v1/tds/merchant/{merchant_id}/ldc</div>
+                    </div>
+
+                    <div class="doc-subsection-title">Query Parameters</div>
+                    <table class="doc-table">
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td><code>contact_id</code></td>
+                            <td>string</td>
+                            <td><span class="doc-badge doc-badge-success">Required*</span></td>
+                            <td>Contact ID to search for (e.g., <code>cont_OxGtNkW8Y1</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><code>tds_category</code></td>
+                            <td>string</td>
+                            <td><span class="doc-badge doc-badge-success">Required*</span></td>
+                            <td>TDS category (e.g., <code>194C</code>, <code>194J</code>, <code>194H</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><code>active_on</code></td>
+                            <td>number</td>
+                            <td>Optional</td>
+                            <td>Unix timestamp to check validity (defaults to current time)</td>
+                        </tr>
+                    </table>
+
+                    <div class="doc-subsection-title">Example Request</div>
+                    <div class="doc-code-block">
+<pre>GET /internal/v1/tds/merchant/JInBTCIHDIQAOW/ldc?contact_id=cont_OxGtNkW8Y1&tds_category=194C</pre>
+                    </div>
+
+                    <div class="doc-subsection-title" style="margin-top: 24px;">Mode 2: Search by Certificate Number</div>
+                    <div class="doc-api-block">
+                        <div class="doc-api-method">GET</div>
+                        <div class="doc-api-endpoint">/internal/v1/tds/merchant/{merchant_id}/ldc</div>
+                    </div>
+
+                    <div class="doc-subsection-title">Query Parameters</div>
+                    <table class="doc-table">
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td><code>certificate_number</code></td>
+                            <td>string</td>
+                            <td><span class="doc-badge doc-badge-success">Required*</span></td>
+                            <td>Certificate number to search (e.g., <code>LDC-2026-001234</code>)</td>
+                        </tr>
+                    </table>
+
+                    <div class="doc-subsection-title">Example Request</div>
+                    <div class="doc-code-block">
+<pre>GET /internal/v1/tds/merchant/JInBTCIHDIQAOW/ldc?certificate_number=LDC-2026-001234</pre>
+                    </div>
+
+                    <div class="doc-callout doc-callout-warning" style="margin-top: 16px;">
+                        <div class="doc-callout-title">Search Mode Selection</div>
+                        <p>*Either <code>contact_id + tds_category</code> OR <code>certificate_number</code> must be provided. Both modes are mutually exclusive.</p>
+                    </div>
+
+                    <div class="doc-subsection-title" style="margin-top: 20px;">Success Response</div>
+                    <div class="doc-code-block">
+<pre>{
+  <span class="string">"success"</span>: <span class="keyword">true</span>,
+  <span class="string">"data"</span>: {
+    <span class="string">"certificate"</span>: {
+      <span class="string">"id"</span>: <span class="string">"ldc_AbCdEfGh12"</span>,
+      <span class="string">"merchant_id"</span>: <span class="string">"JInBTCIHDIQAOW"</span>,
+      <span class="string">"contact_id"</span>: <span class="string">"cont_OxGtNkW8Y1"</span>,
+      <span class="string">"tds_category_id"</span>: <span class="string">"194C"</span>,
+      <span class="string">"certificate_number"</span>: <span class="string">"LDC-2026-001234"</span>,
+      <span class="string">"ldc_rate"</span>: <span class="number">2.0</span>,
+      <span class="string">"valid_from"</span>: <span class="number">1737504000</span>,
+      <span class="string">"valid_to"</span>: <span class="number">1769040000</span>,
+      <span class="string">"file_id"</span>: <span class="string">"file_HjKlMnOpQr"</span>,
+      <span class="string">"is_active"</span>: <span class="keyword">true</span>,
+      <span class="string">"created_at"</span>: <span class="number">1737654321</span>,
+      <span class="string">"updated_at"</span>: <span class="number">1737654321</span>
+    }
+  }
+}</pre>
+                    </div>
+
+                    <div class="doc-subsection-title">Not Found Response</div>
+                    <div class="doc-code-block">
+<pre>{
+  <span class="string">"success"</span>: <span class="keyword">false</span>,
+  <span class="string">"error"</span>: {
+    <span class="string">"code"</span>: <span class="string">"LDC_NOT_FOUND"</span>,
+    <span class="string">"message"</span>: <span class="string">"No active LDC certificate found for the given criteria"</span>
+  }
+}</pre>
+                    </div>
+
+                    <div class="doc-subsection-title">DB Query Logic</div>
+                    <div class="doc-code-block">
+<pre><span class="comment">-- Mode 1: Search by contact_id + tds_category (active today)</span>
+<span class="keyword">SELECT</span> * <span class="keyword">FROM</span> tds_ldc_certificates
+<span class="keyword">WHERE</span> merchant_id = <span class="string">'{merchant_id}'</span>
+  <span class="keyword">AND</span> contact_id = <span class="string">'{contact_id}'</span>
+  <span class="keyword">AND</span> tds_category_id = <span class="string">'{tds_category}'</span>
+  <span class="keyword">AND</span> valid_from &lt;= <span class="number">UNIX_TIMESTAMP()</span>
+  <span class="keyword">AND</span> valid_to &gt;= <span class="number">UNIX_TIMESTAMP()</span>
+  <span class="keyword">AND</span> deleted_at <span class="keyword">IS NULL</span>
+<span class="keyword">LIMIT</span> <span class="number">1</span>;
+
+<span class="comment">-- Mode 2: Search by certificate_number</span>
+<span class="keyword">SELECT</span> * <span class="keyword">FROM</span> tds_ldc_certificates
+<span class="keyword">WHERE</span> merchant_id = <span class="string">'{merchant_id}'</span>
+  <span class="keyword">AND</span> certificate_number = <span class="string">'{certificate_number}'</span>
+  <span class="keyword">AND</span> deleted_at <span class="keyword">IS NULL</span>
+<span class="keyword">LIMIT</span> <span class="number">1</span>;</pre>
                     </div>
                 </div>
             </div>
@@ -7603,6 +7847,308 @@ ${JSON.stringify(responseData, null, 2)}</pre>`;
         function closeLdcModal() {
             document.getElementById('ldc-modal').classList.remove('visible');
             updateStepText('LDC Management closed.');
+        }
+        
+        // ==================== LDC SEARCH MODAL ====================
+        
+        let ldcSearchContactsFetched = false;
+        
+        function openLdcSearchModal() {
+            // Reset state
+            ldcSearchContactsFetched = false;
+            document.getElementById('ldc-search-contact-select').innerHTML = '<option value="">-- Click to load contacts --</option>';
+            document.getElementById('ldc-search-category').value = '';
+            document.getElementById('ldc-search-cert-number').value = '';
+            document.getElementById('api-ldc-search-call').style.display = 'none';
+            document.getElementById('ldc-search-results').style.display = 'none';
+            document.getElementById('ldc-search-no-results').style.display = 'none';
+            switchLdcSearchMode('contact');
+            
+            document.getElementById('ldc-search-modal').classList.add('visible');
+            updateStepText('🔍 LDC Search opened. Search for active certificates.');
+        }
+        
+        function closeLdcSearchModal() {
+            document.getElementById('ldc-search-modal').classList.remove('visible');
+            updateStepText('LDC Search closed.');
+        }
+        
+        function switchLdcSearchMode(mode) {
+            const contactTab = document.getElementById('ldc-search-tab-contact');
+            const certTab = document.getElementById('ldc-search-tab-certificate');
+            const contactMode = document.getElementById('ldc-search-mode-contact');
+            const certMode = document.getElementById('ldc-search-mode-certificate');
+            
+            // Reset results
+            document.getElementById('api-ldc-search-call').style.display = 'none';
+            document.getElementById('ldc-search-results').style.display = 'none';
+            document.getElementById('ldc-search-no-results').style.display = 'none';
+            
+            if (mode === 'contact') {
+                contactTab.classList.add('active');
+                certTab.classList.remove('active');
+                contactMode.style.display = 'block';
+                certMode.style.display = 'none';
+            } else {
+                contactTab.classList.remove('active');
+                certTab.classList.add('active');
+                contactMode.style.display = 'none';
+                certMode.style.display = 'block';
+            }
+        }
+        
+        function loadLdcSearchContacts() {
+            if (ldcSearchContactsFetched) return;
+            
+            const select = document.getElementById('ldc-search-contact-select');
+            const status = document.getElementById('ldc-search-contacts-status');
+            
+            status.style.display = 'flex';
+            status.innerHTML = '<div class="spinner"></div><span>Loading contacts...</span>';
+            
+            setTimeout(() => {
+                select.innerHTML = '<option value="">-- Select a contact --</option>';
+                mockContacts.forEach(contact => {
+                    select.innerHTML += `<option value="${contact.id}">${contact.name} (${contact.type}) - ${contact.id}</option>`;
+                });
+                
+                status.style.display = 'none';
+                ldcSearchContactsFetched = true;
+            }, 800);
+        }
+        
+        function searchLdcByContact() {
+            const contactId = document.getElementById('ldc-search-contact-select').value;
+            const category = document.getElementById('ldc-search-category').value;
+            
+            if (!contactId) {
+                alert('Please select a contact');
+                return;
+            }
+            if (!category) {
+                alert('Please select a TDS category');
+                return;
+            }
+            
+            const apiCall = document.getElementById('api-ldc-search-call');
+            const endpoint = document.getElementById('api-ldc-search-endpoint');
+            const response = document.getElementById('api-ldc-search-response');
+            const results = document.getElementById('ldc-search-results');
+            const resultContent = document.getElementById('ldc-search-result-content');
+            const noResults = document.getElementById('ldc-search-no-results');
+            
+            // Show API call
+            apiCall.style.display = 'block';
+            endpoint.textContent = `/internal/v1/tds/merchant/${MERCHANT_ID}/ldc?contact_id=${contactId}&tds_category=${category}`;
+            response.innerHTML = '<span style="color: var(--text-muted);">Searching...</span>';
+            
+            // Also show in main API panel
+            document.getElementById('api-ldc-fetch').classList.add('visible');
+            document.getElementById('api-ldc-fetch-endpoint').textContent = `/internal/v1/tds/merchant/${MERCHANT_ID}/ldc?contact_id=${contactId}&tds_category=${category}`;
+            
+            updateStepText(`🔍 Searching for active ${category} certificate for contact ${contactId}...`);
+            
+            setTimeout(() => {
+                // Search in dbState
+                const contactCerts = dbState.ldcCertificates[contactId] || [];
+                const now = Math.floor(Date.now() / 1000);
+                const activeCert = contactCerts.find(cert => 
+                    cert.tds_category_id === category && 
+                    cert.valid_from <= now && 
+                    cert.valid_to >= now && 
+                    !cert.deleted_at
+                );
+                
+                if (activeCert) {
+                    // Found active certificate
+                    const responseJson = {
+                        success: true,
+                        data: {
+                            certificate: {
+                                id: activeCert.id,
+                                merchant_id: activeCert.merchant_id,
+                                contact_id: activeCert.contact_id,
+                                tds_category_id: activeCert.tds_category_id,
+                                certificate_number: activeCert.certificate_number,
+                                ldc_rate: activeCert.ldc_rate,
+                                valid_from: activeCert.valid_from,
+                                valid_to: activeCert.valid_to,
+                                file_id: activeCert.file_id,
+                                is_active: true,
+                                created_at: activeCert.created_at,
+                                updated_at: activeCert.updated_at
+                            }
+                        }
+                    };
+                    
+                    response.innerHTML = `<pre class="api-json" style="color: var(--accent-green);">Response: 200 OK\n${JSON.stringify(responseJson, null, 2)}</pre>`;
+                    document.getElementById('api-ldc-fetch-payload').innerHTML = `<pre class="api-json" style="color: var(--accent-green);">Response: 200 OK\n${JSON.stringify(responseJson, null, 2)}</pre>`;
+                    
+                    // Show result card
+                    noResults.style.display = 'none';
+                    results.style.display = 'block';
+                    resultContent.innerHTML = `
+                        <div class="ldc-certificate-card" style="margin: 0;">
+                            <div class="ldc-cert-header">
+                                <span class="ldc-cert-category">${activeCert.tds_category_id}</span>
+                                <span class="ldc-cert-status active">Active</span>
+                            </div>
+                            <div class="ldc-cert-body">
+                                <div class="ldc-cert-number">${activeCert.certificate_number}</div>
+                                <div class="ldc-cert-rate">${activeCert.ldc_rate}% Reduced Rate</div>
+                                <div class="ldc-cert-validity">
+                                    📅 ${new Date(activeCert.valid_from * 1000).toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric'})} - ${new Date(activeCert.valid_to * 1000).toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric'})}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    updateStepText(`✅ Found active ${category} certificate: ${activeCert.certificate_number}`);
+                } else {
+                    // No certificate found
+                    const errorJson = {
+                        success: false,
+                        error: {
+                            code: "LDC_NOT_FOUND",
+                            message: "No active LDC certificate found for the given criteria"
+                        }
+                    };
+                    
+                    response.innerHTML = `<pre class="api-json" style="color: #ef4444;">Response: 404 Not Found\n${JSON.stringify(errorJson, null, 2)}</pre>`;
+                    document.getElementById('api-ldc-fetch-payload').innerHTML = `<pre class="api-json" style="color: #ef4444;">Response: 404 Not Found\n${JSON.stringify(errorJson, null, 2)}</pre>`;
+                    
+                    results.style.display = 'none';
+                    noResults.style.display = 'block';
+                    document.getElementById('ldc-search-no-results-msg').textContent = `No active ${category} certificate found for this contact.`;
+                    
+                    updateStepText(`❌ No active ${category} certificate found for contact ${contactId}`);
+                }
+                
+                // Hide API panel after delay
+                setTimeout(() => {
+                    document.getElementById('api-ldc-fetch').classList.remove('visible');
+                }, 5000);
+                
+            }, 1000);
+        }
+        
+        function searchLdcByCertificate() {
+            const certNumber = document.getElementById('ldc-search-cert-number').value.trim();
+            
+            if (!certNumber) {
+                alert('Please enter a certificate number');
+                return;
+            }
+            
+            const apiCall = document.getElementById('api-ldc-search-call');
+            const endpoint = document.getElementById('api-ldc-search-endpoint');
+            const response = document.getElementById('api-ldc-search-response');
+            const results = document.getElementById('ldc-search-results');
+            const resultContent = document.getElementById('ldc-search-result-content');
+            const noResults = document.getElementById('ldc-search-no-results');
+            
+            // Show API call
+            apiCall.style.display = 'block';
+            endpoint.textContent = `/internal/v1/tds/merchant/${MERCHANT_ID}/ldc?certificate_number=${encodeURIComponent(certNumber)}`;
+            response.innerHTML = '<span style="color: var(--text-muted);">Searching...</span>';
+            
+            // Also show in main API panel
+            document.getElementById('api-ldc-fetch').classList.add('visible');
+            document.getElementById('api-ldc-fetch-endpoint').textContent = `/internal/v1/tds/merchant/${MERCHANT_ID}/ldc?certificate_number=${encodeURIComponent(certNumber)}`;
+            
+            updateStepText(`🔍 Searching for certificate ${certNumber}...`);
+            
+            setTimeout(() => {
+                // Search in all certificates in dbState
+                let foundCert = null;
+                for (const contactId in dbState.ldcCertificates) {
+                    const cert = dbState.ldcCertificates[contactId].find(c => c.certificate_number === certNumber && !c.deleted_at);
+                    if (cert) {
+                        foundCert = cert;
+                        break;
+                    }
+                }
+                
+                if (foundCert) {
+                    const now = Math.floor(Date.now() / 1000);
+                    const isActive = foundCert.valid_from <= now && foundCert.valid_to >= now;
+                    
+                    const responseJson = {
+                        success: true,
+                        data: {
+                            certificate: {
+                                id: foundCert.id,
+                                merchant_id: foundCert.merchant_id,
+                                contact_id: foundCert.contact_id,
+                                tds_category_id: foundCert.tds_category_id,
+                                certificate_number: foundCert.certificate_number,
+                                ldc_rate: foundCert.ldc_rate,
+                                valid_from: foundCert.valid_from,
+                                valid_to: foundCert.valid_to,
+                                file_id: foundCert.file_id,
+                                is_active: isActive,
+                                created_at: foundCert.created_at,
+                                updated_at: foundCert.updated_at
+                            }
+                        }
+                    };
+                    
+                    response.innerHTML = `<pre class="api-json" style="color: var(--accent-green);">Response: 200 OK\n${JSON.stringify(responseJson, null, 2)}</pre>`;
+                    document.getElementById('api-ldc-fetch-payload').innerHTML = `<pre class="api-json" style="color: var(--accent-green);">Response: 200 OK\n${JSON.stringify(responseJson, null, 2)}</pre>`;
+                    
+                    // Show result card
+                    noResults.style.display = 'none';
+                    results.style.display = 'block';
+                    
+                    const statusClass = isActive ? 'active' : (foundCert.valid_to < now ? 'expired' : 'pending');
+                    const statusText = isActive ? 'Active' : (foundCert.valid_to < now ? 'Expired' : 'Pending');
+                    
+                    resultContent.innerHTML = `
+                        <div class="ldc-certificate-card ${statusClass}" style="margin: 0;">
+                            <div class="ldc-cert-header">
+                                <span class="ldc-cert-category">${foundCert.tds_category_id}</span>
+                                <span class="ldc-cert-status ${statusClass}">${statusText}</span>
+                            </div>
+                            <div class="ldc-cert-body">
+                                <div class="ldc-cert-number">${foundCert.certificate_number}</div>
+                                <div class="ldc-cert-rate">${foundCert.ldc_rate}% Reduced Rate</div>
+                                <div class="ldc-cert-validity">
+                                    📅 ${new Date(foundCert.valid_from * 1000).toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric'})} - ${new Date(foundCert.valid_to * 1000).toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric'})}
+                                </div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;">
+                                    Contact: ${foundCert.contact_id}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    updateStepText(`✅ Found certificate: ${foundCert.certificate_number} (${statusText})`);
+                } else {
+                    // No certificate found
+                    const errorJson = {
+                        success: false,
+                        error: {
+                            code: "LDC_NOT_FOUND",
+                            message: "No LDC certificate found with the given certificate number"
+                        }
+                    };
+                    
+                    response.innerHTML = `<pre class="api-json" style="color: #ef4444;">Response: 404 Not Found\n${JSON.stringify(errorJson, null, 2)}</pre>`;
+                    document.getElementById('api-ldc-fetch-payload').innerHTML = `<pre class="api-json" style="color: #ef4444;">Response: 404 Not Found\n${JSON.stringify(errorJson, null, 2)}</pre>`;
+                    
+                    results.style.display = 'none';
+                    noResults.style.display = 'block';
+                    document.getElementById('ldc-search-no-results-msg').textContent = `No certificate found with number: ${certNumber}`;
+                    
+                    updateStepText(`❌ No certificate found with number: ${certNumber}`);
+                }
+                
+                // Hide API panel after delay
+                setTimeout(() => {
+                    document.getElementById('api-ldc-fetch').classList.remove('visible');
+                }, 5000);
+                
+            }, 1000);
         }
         
         function resetLdcForm() {
