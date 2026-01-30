@@ -5120,9 +5120,17 @@
     updated_at      <span class="type">BIGINT</span>         <span class="keyword">NOT NULL</span>,
     deleted_at      <span class="type">BIGINT</span>         <span class="keyword">NULL</span>,        <span class="comment">-- Soft delete timestamp</span>
     
-    <span class="keyword">UNIQUE KEY</span> idx_merchant_key (merchant_id, meta_key),
-    <span class="keyword">INDEX</span> idx_merchant (merchant_id),
+    <span class="comment">-- Primary lookup: merchant_id + meta_key (also ensures uniqueness)</span>
+    <span class="comment">-- This index also serves merchant_id-only queries via leftmost prefix rule</span>
+    <span class="keyword">UNIQUE KEY</span> uk_merchant_meta (merchant_id, meta_key),
+    
+    <span class="comment">-- Soft delete filter</span>
     <span class="keyword">INDEX</span> idx_deleted (deleted_at)
+    
+    <span class="comment">-- NOTE: No separate INDEX on merchant_id needed!</span>
+    <span class="comment">-- The UNIQUE KEY (merchant_id, meta_key) already covers:</span>
+    <span class="comment">--   WHERE merchant_id = 'X' AND meta_key = 'Y'  (full index)</span>
+    <span class="comment">--   WHERE merchant_id = 'X'                     (leftmost prefix)</span>
 );</pre>
                     </div>
 
