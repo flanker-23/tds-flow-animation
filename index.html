@@ -2774,7 +2774,7 @@
                                     <span class="api-endpoint">x-balances-ext.razorpay.com/v1/accounts?merchant_id=JInBTCIHDIQAOW</span>
                                 </div>
                                 <div class="api-payload" id="api-fetch-banks-payload">
-<pre class="api-json">Response: { bank_accounts: [...] }</pre>
+<pre class="api-json">Response: { accounts: [...] }</pre>
                                 </div>
                             </div>
                             
@@ -7144,11 +7144,47 @@
         let bankAccountsFetched = false;
         let selectedBankAccount = null;
         
-        // Simulated merchant bank accounts (in real app, this comes from API)
+        // Simulated merchant bank accounts (matches x-balances-ext API response)
         const mockBankAccounts = [
-            { id: 'ba_001', account_number: '50200012345678', ifsc: 'HDFC0001234', bank_name: 'HDFC Bank', type: 'current' },
-            { id: 'ba_002', account_number: '918020012345678', ifsc: 'UTIB0001234', bank_name: 'Axis Bank', type: 'current' },
-            { id: 'ba_003', account_number: '1234567890123456', ifsc: 'ICIC0001234', bank_name: 'ICICI Bank', type: 'savings' }
+            { 
+                status: 'active', 
+                merchantId: 'JInBTCIHDIQAOW', 
+                accountNumber: '400700000000', 
+                accountType: 'direct', 
+                channel: 'rbl', 
+                currency: 'INR', 
+                balance: '603546',
+                lastChangedAt: '1757569495',
+                lastFetchedAt: '1757930450',
+                lastAttemptedAt: '1757930450',
+                createdAt: '1757569450'
+            },
+            { 
+                status: 'active', 
+                merchantId: 'JInBTCIHDIQAOW', 
+                accountNumber: '918020012345678', 
+                accountType: 'direct', 
+                channel: 'axis', 
+                currency: 'INR', 
+                balance: '125000',
+                lastChangedAt: '1757569500',
+                lastFetchedAt: '1757930455',
+                lastAttemptedAt: '1757930455',
+                createdAt: '1757569455'
+            },
+            { 
+                status: 'active', 
+                merchantId: 'JInBTCIHDIQAOW', 
+                accountNumber: '50200012345678', 
+                accountType: 'direct', 
+                channel: 'icici', 
+                currency: 'INR', 
+                balance: '890000',
+                lastChangedAt: '1757569510',
+                lastFetchedAt: '1757930460',
+                lastAttemptedAt: '1757930460',
+                createdAt: '1757569460'
+            }
         ];
         
         function onBankAccountClick() {
@@ -7173,14 +7209,29 @@
             
             // Simulate API call delay
             setTimeout(() => {
-                // Build response JSON for display
+                // Build response JSON for display (matches x-balances-ext API)
                 const responseData = {
-                    bank_accounts: mockBankAccounts.map(acc => ({
-                        id: acc.id,
-                        account_number: acc.account_number.slice(0,4) + '****' + acc.account_number.slice(-4),
-                        bank_name: acc.bank_name,
-                        ifsc: acc.ifsc
+                    accounts: mockBankAccounts.map(acc => ({
+                        status: acc.status,
+                        merchantId: acc.merchantId,
+                        accountNumber: acc.accountNumber.slice(0,4) + '****' + acc.accountNumber.slice(-4),
+                        accountType: acc.accountType,
+                        channel: acc.channel,
+                        currency: acc.currency,
+                        balance: acc.balance,
+                        lastChangedAt: acc.lastChangedAt,
+                        lastFetchedAt: acc.lastFetchedAt,
+                        createdAt: acc.createdAt
                     }))
+                };
+                
+                // Channel to bank name mapping
+                const channelToBankName = {
+                    'rbl': 'RBL Bank',
+                    'axis': 'Axis Bank',
+                    'icici': 'ICICI Bank',
+                    'hdfc': 'HDFC Bank',
+                    'yes': 'YES Bank'
                 };
                 
                 // Update API response with detailed payload (main panel)
@@ -7190,15 +7241,17 @@ ${JSON.stringify(responseData, null, 2)}</pre>`;
                 // Update modal API response
                 document.getElementById('bank-api-response').innerHTML = `
                     <div style="color: var(--accent-green); margin-bottom: 4px;">✓ Response: 200 OK</div>
-                    <div style="color: var(--text-muted);">Found ${mockBankAccounts.length} bank accounts</div>
+                    <div style="color: var(--text-muted);">Found ${mockBankAccounts.length} accounts</div>
                 `;
                 
                 // Populate dropdown
                 select.innerHTML = '<option value="">-- Select a bank account --</option>';
-                mockBankAccounts.forEach(acc => {
-                    const maskedNum = acc.account_number.slice(0, 4) + '****' + acc.account_number.slice(-4);
-                    select.innerHTML += `<option value="${acc.id}" data-account="${acc.account_number}" data-ifsc="${acc.ifsc}">
-                        ${acc.bank_name} - ${maskedNum} (${acc.type})
+                mockBankAccounts.forEach((acc, idx) => {
+                    const maskedNum = acc.accountNumber.slice(0, 4) + '****' + acc.accountNumber.slice(-4);
+                    const bankName = channelToBankName[acc.channel] || acc.channel.toUpperCase();
+                    const balanceFormatted = (parseInt(acc.balance) / 100).toLocaleString('en-IN', {style: 'currency', currency: 'INR'});
+                    select.innerHTML += `<option value="acc_${idx}" data-account="${acc.accountNumber}" data-channel="${acc.channel}">
+                        ${bankName} - ${maskedNum} (${acc.accountType}) - ${balanceFormatted}
                     </option>`;
                 });
                 
@@ -7227,7 +7280,7 @@ ${JSON.stringify(responseData, null, 2)}</pre>`;
                 selectedBankAccount = {
                     id: selectedOption.value,
                     account_number: selectedOption.dataset.account,
-                    ifsc: selectedOption.dataset.ifsc
+                    channel: selectedOption.dataset.channel
                 };
                 updateStepText(`✅ Selected: ${selectedOption.text}`);
             } else {
@@ -7263,8 +7316,17 @@ ${JSON.stringify(responseData, null, 2)}</pre>`;
                 // Update API response
                 document.getElementById('edit-bank-api-response').innerHTML = `
                     <div style="color: var(--accent-green); margin-bottom: 4px;">✓ Response: 200 OK</div>
-                    <div style="color: var(--text-muted);">Found ${mockBankAccounts.length} bank accounts</div>
+                    <div style="color: var(--text-muted);">Found ${mockBankAccounts.length} accounts</div>
                 `;
+                
+                // Channel to bank name mapping
+                const channelToBankName = {
+                    'rbl': 'RBL Bank',
+                    'axis': 'Axis Bank',
+                    'icici': 'ICICI Bank',
+                    'hdfc': 'HDFC Bank',
+                    'yes': 'YES Bank'
+                };
                 
                 // Get current account number from config
                 const config = dbState.metadata['TDS_PAYMENT_CONFIG']?.value || {};
@@ -7272,19 +7334,21 @@ ${JSON.stringify(responseData, null, 2)}</pre>`;
                 
                 // Populate dropdown
                 select.innerHTML = '<option value="">-- Select a bank account --</option>';
-                mockBankAccounts.forEach(acc => {
-                    const maskedNum = acc.account_number.slice(0, 4) + '****' + acc.account_number.slice(-4);
-                    const isSelected = acc.account_number === currentAccountNumber;
-                    select.innerHTML += `<option value="${acc.id}" data-account="${acc.account_number}" data-ifsc="${acc.ifsc}" ${isSelected ? 'selected' : ''}>
-                        ${acc.bank_name} - ${maskedNum} (${acc.type})
+                mockBankAccounts.forEach((acc, idx) => {
+                    const maskedNum = acc.accountNumber.slice(0, 4) + '****' + acc.accountNumber.slice(-4);
+                    const isSelected = acc.accountNumber === currentAccountNumber;
+                    const bankName = channelToBankName[acc.channel] || acc.channel.toUpperCase();
+                    const balanceFormatted = (parseInt(acc.balance) / 100).toLocaleString('en-IN', {style: 'currency', currency: 'INR'});
+                    select.innerHTML += `<option value="acc_${idx}" data-account="${acc.accountNumber}" data-channel="${acc.channel}" ${isSelected ? 'selected' : ''}>
+                        ${bankName} - ${maskedNum} (${acc.accountType}) - ${balanceFormatted}
                     </option>`;
                     
                     // Set editSelectedBankAccount if this is the current one
                     if (isSelected) {
                         editSelectedBankAccount = {
-                            id: acc.id,
-                            account_number: acc.account_number,
-                            ifsc: acc.ifsc
+                            id: `acc_${idx}`,
+                            account_number: acc.accountNumber,
+                            channel: acc.channel
                         };
                     }
                 });
@@ -7313,7 +7377,7 @@ ${JSON.stringify(responseData, null, 2)}</pre>`;
                 editSelectedBankAccount = {
                     id: selectedOption.value,
                     account_number: selectedOption.dataset.account,
-                    ifsc: selectedOption.dataset.ifsc
+                    channel: selectedOption.dataset.channel
                 };
                 updateStepText(`✅ Selected: ${selectedOption.text}`);
             } else {
