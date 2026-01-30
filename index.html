@@ -5185,7 +5185,7 @@
     merchant_id         <span class="type">VARCHAR(14)</span>    <span class="keyword">NOT NULL</span>,
     contact_id          <span class="type">VARCHAR(14)</span>    <span class="keyword">NOT NULL</span>,
     tds_category_id     <span class="type">VARCHAR(10)</span>    <span class="keyword">NOT NULL</span>,
-    certificate_number  <span class="type">VARCHAR(50)</span>    <span class="keyword">NOT NULL</span>,
+    certificate_number  <span class="type">VARCHAR(50)</span>    <span class="keyword">NOT NULL UNIQUE</span>,
     ldc_rate            <span class="type">DECIMAL(5,2)</span>   <span class="keyword">NOT NULL</span>,
     valid_from          <span class="type">BIGINT</span>         <span class="keyword">NOT NULL</span>,
     valid_to            <span class="type">BIGINT</span>         <span class="keyword">NOT NULL</span>,
@@ -5194,9 +5194,18 @@
     updated_at          <span class="type">BIGINT</span>         <span class="keyword">NOT NULL</span>,
     deleted_at          <span class="type">BIGINT</span>         <span class="keyword">NULL</span>,        <span class="comment">-- Soft delete timestamp</span>
     
+    <span class="comment">-- Unique constraint on certificate number</span>
+    <span class="keyword">CONSTRAINT</span> uk_certificate_number <span class="keyword">UNIQUE</span> (certificate_number),
+    
+    <span class="comment">-- Single index on certificate_number for fast lookup by certificate</span>
+    <span class="keyword">INDEX</span> idx_certificate_number (certificate_number),
+    
+    <span class="comment">-- Composite index for merchant + contact + category lookups</span>
+    <span class="keyword">INDEX</span> idx_merchant_contact_category (merchant_id, contact_id, tds_category_id),
+    
+    <span class="comment">-- Other indexes</span>
     <span class="keyword">INDEX</span> idx_merchant_contact (merchant_id, contact_id),
     <span class="keyword">INDEX</span> idx_validity (valid_from, valid_to),
-    <span class="keyword">INDEX</span> idx_category (tds_category_id),
     <span class="keyword">INDEX</span> idx_deleted (deleted_at)
 );</pre>
                     </div>
